@@ -1,4 +1,4 @@
-# Shotclock — drahtlose Wurfuhr für Lacrosse
+# Shotclock Lacrosse
 
 Autarke Shotclock-Anlage: Ein Tablet steuert über WLAN einen Controller, der per
 LoRa-Funk eine große LED-Anzeige und ein Horn ansteuert. **Kein Router, kein
