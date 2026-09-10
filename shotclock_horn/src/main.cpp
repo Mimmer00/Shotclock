@@ -116,6 +116,8 @@ void setup() {
     pinMode(HORN_BTN_PIN, INPUT_PULLUP);
 
     Serial.begin(115200);
+    // Ohne USB-Host wuerde jeder Serial-Write bis zum Timeout blockieren.
+    Serial.setTxTimeoutMs(0);
     delay(300);
     Serial.println("\n=== SHOTCLOCK HORN (T3-S3 E-Paper) ===");
     Serial.printf("Horn-Ausgang: GPIO %d, aktiv %s\n",

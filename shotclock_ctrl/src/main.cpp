@@ -132,13 +132,19 @@ void cmdStop() {
     portEXIT_CRITICAL(&clkMux);
     queueLora("STOP", sec, 3);
 }
+// RESET: laeuft die Uhr, wird auf Maximum gesetzt und laeuft SOFORT weiter
+// (Shotclock-Reset im laufenden Spiel). Bei gestoppter Uhr nur setzen.
 void cmdReset() {
     portENTER_CRITICAL(&clkMux);
-    clkState   = ST_STOP;
+    bool wasRunning = (clkState == ST_START);
     clkSeconds = clkMax;
+    if (wasRunning) nextTickMs = millis() + 1000 + TX_PHASE_MS;  // Phase neu setzen
+    else            clkState   = ST_STOP;
     int sec = clkSeconds;
     portEXIT_CRITICAL(&clkMux);
-    queueLora("RESET", sec, 3);
+
+    if (wasRunning) queueLora("START", sec, 3);   // Empfaenger: sofort neu starten
+    else            queueLora("RESET", sec, 3);   // Empfaenger: setzen + gestoppt
 }
 void cmdHorn(int ms) {
     queueLora("HORN", ms, 2);   // 2x Redundanz; Horn-Modul dedupliziert
@@ -631,6 +637,9 @@ void drawOled() {
 // ---------------- Setup / Loop ----------------
 void setup() {
     Serial.begin(115200);
+    // Ohne USB-Host blockiert jeder Serial-Write bis zum Timeout und
+    // verzoegert Timer-Tick und Webserver -> nicht blockieren.
+    Serial.setTxTimeoutMs(0);
     pinMode(PIN_LED, OUTPUT);
     digitalWrite(PIN_LED, LOW);
 

@@ -228,8 +228,11 @@ void handlePacket(const char* cmd, int sec) {
     if (strcmp(cmd, "START") == 0) {
         // Redundanz-Duplikat ignorieren: gleiche Sekundenzahl kurz nach dem
         // ersten START wuerde sonst die Tick-Phase verschieben (Panel-Delay!)
+        // Fenster nur 600ms: die 3 Wiederholungen kommen bei 0/200/400ms.
+        // Laenger duerfte es nicht sein, sonst wird ein RESET-im-Lauf
+        // (sendet START mit gleichem Maximum) faelschlich verschluckt.
         if (clockState == RUNNING && sec == startValue &&
-            (millis() - clockStartMs) < 1500UL) {
+            (millis() - clockStartMs) < 600UL) {
             return;
         }
         // Lokalen Timer ab empfangenem Sekundenwert starten
@@ -272,6 +275,9 @@ void handlePacket(const char* cmd, int sec) {
 
 void setup() {
     Serial.begin(115200);
+    // Ohne USB-Host blockiert jeder Serial-Write bis zum Timeout und
+    // verzoegert den Timer-Tick -> nicht blockieren, Ausgabe notfalls verwerfen.
+    Serial.setTxTimeoutMs(0);
     pinMode(PIN_BUZZER, OUTPUT);
     pinMode(PIN_LED, OUTPUT);
     digitalWrite(PIN_BUZZER, LOW);
