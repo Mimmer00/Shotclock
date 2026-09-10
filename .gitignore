@@ -1,0 +1,19 @@
+# PlatformIO Build-Artefakte (werden von `pio run` neu erzeugt)
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Python (shotclock_pi, rx_logger.py)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
